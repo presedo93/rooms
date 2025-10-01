@@ -6,5 +6,36 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = []
 
+[dependency-groups]
+dev = [
+  "pytest>=8.0.0",
+  "black>=24.0.0",
+  "isort>=5.13.0",
+  "flake8>=7.0.0",
+  "basedpyright>=1.16.0",
+]
+
 [tool.uv.workspace]
 members = ["tape", "replay", "lab", "desk"]
+
+[tool.black]
+line-length = 88
+target-version = ['py313']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["rooms", "tape", "replay", "lab", "desk"]
+
+[tool.pyright]
+pythonVersion = "3.13"
+typeCheckingMode = "standard"
+reportMissingTypeStubs = false
+reportPrivateUsage = false
+reportImportCycles = true
+reportUnusedImport = true
+reportUnusedVariable = true
+
+[[tool.pyright.executionEnvironments]]
+root = "."
+extraPaths = ["."]
