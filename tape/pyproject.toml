@@ -1,0 +1,7 @@
+[project]
+name = "tape"
+version = "0.1.0"
+description = "This is the room where all the data is harvested."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
