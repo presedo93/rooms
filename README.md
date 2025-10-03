@@ -73,8 +73,12 @@ Each room contains:
    # Clone and enter directory
    cd rooms
 
-   # Install dependencies
-   uv sync
+    # Install dependencies for the root package
+    uv sync
+
+    # Install dependencies for all workspace members
+    uv sync --all-packages
+
    ```
 
 3. **Run modules**:

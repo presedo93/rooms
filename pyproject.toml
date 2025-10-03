@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Welcome to all my trading rooms!"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = ["loguru>=0.7.3", "streamlit>=1.50.0"]
 
 [dependency-groups]
 dev = [
@@ -28,14 +28,4 @@ line_length = 88
 known_first_party = ["rooms", "tape", "replay", "lab", "desk"]
 
 [tool.pyright]
-pythonVersion = "3.13"
 typeCheckingMode = "standard"
-reportMissingTypeStubs = false
-reportPrivateUsage = false
-reportImportCycles = true
-reportUnusedImport = true
-reportUnusedVariable = true
-
-[[tool.pyright.executionEnvironments]]
-root = "."
-extraPaths = ["."]
