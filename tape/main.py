@@ -1,7 +1,5 @@
 import streamlit as st
-
 from loguru import logger
-
 from pages.bybit import bybit_page
 from pages.gecko import gecko_page
 
