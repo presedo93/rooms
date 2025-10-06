@@ -1,32 +1,39 @@
 # Rooms - Trading System
 
-Welcome to all my trading rooms! This is a modular Python trading system built with a workspace structure using `uv`.
+Welcome to all my trading rooms! This is a modular Python trading system built
+with a workspace structure using `uv`.
 
 ## Overview
 
-The project is organized into four main "rooms", each serving a specific purpose in the trading workflow:
+The project is organized into four main "rooms", each serving a specific
+purpose in the trading workflow:
 
 ## Architecture
 
 ### 🏢 Desk
-**The integration hub** - Brings all components together into a cohesive trading platform.
+
+**The integration hub** - Brings all components together into a cohesive
+trading platform.
 
 - **Purpose**: Orchestrates the entire trading system
 - **Status**: Initial setup
 
 ### 📊 Tape
+
 **Data harvesting room** - Collects and processes market data.
 
 - **Purpose**: Data acquisition and preprocessing
 - **Status**: Initial setup
 
 ### 🔄 Replay
+
 **Strategy optimization room** - Replays and optimizes trading strategies.
 
 - **Purpose**: Backtesting and strategy refinement
 - **Status**: Initial setup
 
 ### 🧪 Lab
+
 **Innovation room** - Tests crazy ideas and experimental features.
 
 - **Purpose**: Research and experimentation
@@ -34,7 +41,7 @@ The project is organized into four main "rooms", each serving a specific purpose
 
 ## Project Structure
 
-```
+```markdown
 rooms/
 ├── pyproject.toml          # Workspace configuration
 ├── main.py                 # Root entry point
@@ -47,6 +54,7 @@ rooms/
 ```
 
 Each room contains:
+
 - `pyproject.toml` - Module configuration
 - `main.py` - Module entry point
 - `README.md` - Module documentation
@@ -60,6 +68,7 @@ Each room contains:
 ## Getting Started
 
 1. **Prerequisites**:
+
    ```bash
    # Install uv
    curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -69,9 +78,10 @@ Each room contains:
    ```
 
 2. **Setup**:
-   ```bash
-   # Clone and enter directory
-   cd rooms
+
+    ```bash
+    # Clone and enter directory
+    cd rooms
 
     # Install dependencies for the root package
     uv sync
@@ -79,9 +89,13 @@ Each room contains:
     # Install dependencies for all workspace members
     uv sync --all-packages
 
-   ```
+    # Install the pre-commit hooks
+    uv run pre-commit install
+
+    ```
 
 3. **Run modules**:
+
    ```bash
    # Run entire system
    uv run python main.py
@@ -99,6 +113,7 @@ Each room contains:
 ## Contributing
 
 This is a personal trading system project. Development follows:
+
 - Incremental progress over big changes
 - Test-driven development where applicable
 - Clear documentation and commit messages
