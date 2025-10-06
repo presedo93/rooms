@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "include-component-in-tag": true,
+  "tag-separator": "@",
+  "packages": {
+    ".": {
+      "package-name": "rooms",
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python"
+    },
+    "tape": {
+      "package-name": "tape",
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python"
+    },
+    "lab": {
+      "package-name": "lab",
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python"
+    },
+    "desk": {
+      "package-name": "desk",
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python"
+    },
+    "replay": {
+      "package-name": "replay",
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "python"
+    }
+  }
+}
