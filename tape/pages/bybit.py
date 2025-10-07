@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import plotly.graph_objects as go
 import streamlit as st
 from models.bybit import ByBitCategory, ByBitInstrument, ByBitOHLCV
 
@@ -8,7 +9,11 @@ def bybit_page():
     st.title("Bybit Page")
     st.write("Welcome to the Bybit page!")
 
-    with st.expander("ByBit OHLCV Data"):
+    candles_expander()
+
+
+def candles_expander():
+    with st.expander("ByBit OHLCV"):
         with st.container(horizontal=True):
             from_date = st.date_input("Start date")
             from_time = st.time_input("Start time")
@@ -32,10 +37,6 @@ def bybit_page():
                 start_dt = datetime.combine(from_date, from_time)
                 end_dt = datetime.combine(to_date, to_time)
 
-                st.write(
-                    f"Selected instrument: {instrument.symbol}, Category: {instrument.category}, From: {start_dt}, To: {end_dt}"
-                )
-
                 candles = ByBitOHLCV.fetch(
                     ByBitCategory.from_str(instrument.category),
                     instrument.symbol,
@@ -43,9 +44,35 @@ def bybit_page():
                     start=start_dt,
                     end=end_dt,
                 )
-                st.write(f"Fetched {len(candles)} candles.")
+
+                candlestick = go.Candlestick(
+                    x=[candle.time for candle in candles],
+                    open=[candle.open for candle in candles],
+                    high=[candle.high for candle in candles],
+                    low=[candle.low for candle in candles],
+                    close=[candle.close for candle in candles],
+                    # volume=[candle.volume for candle in candles],
+                )
+
+                layout = go.Layout(
+                    title=f"Candlestick Chart for {instrument.symbol}",
+                    xaxis=dict(title="Date"),
+                    yaxis=dict(title="Price"),
+                )
+
+                fig = go.Figure(data=[candlestick], layout=layout)
+                st.plotly_chart(fig, use_container_width=True)
+
+                # if st.button("Download OHLCV data as CSV"):
+                #     ByBitOHLCV.to_csv(
+                #         symbol=instrument.symbol,
+                #         interval=interval,
+                #         start=start_dt,
+                #         end=end_dt,
+                #         candles=candles,
+                #     )
 
 
 @st.cache_data(show_spinner="Fetching ByBit instruments...")
 def fetch_instruments():
-    return ByBitInstrument.fetch(ByBitCategory.from_str("spot"))
+    return ByBitInstrument.fetch(ByBitCategory.SPOT)

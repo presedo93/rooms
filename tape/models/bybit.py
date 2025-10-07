@@ -10,6 +10,7 @@ from enum import Enum
 from typing import ClassVar, Generic, TypeVar
 
 import httpx
+import pandas as pd
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from pydantic.alias_generators import to_camel
@@ -85,7 +86,18 @@ class ByBitInstrument(BaseModel):
         logger.trace(f"ByBit instruments fetch response: {response.text}")
         result = ByBitResponse["ByBitInstrument"].model_validate(response.json())
 
-        return result.result.data
+        category = result.result.category
+        top_category = category.value if hasattr(category, "value") else str(category)
+
+        return [
+            cls(
+                symbol=d.symbol,
+                base_coin=d.base_coin,
+                quote_coin=d.quote_coin,
+                category=top_category,
+            )
+            for d in result.result.data
+        ]
 
 
 # TODO: move to a common place.
@@ -111,6 +123,10 @@ def _format_filename_timestamp(dt: datetime) -> str:
     return _ensure_utc(dt).strftime("%Y%m%dT%H%M%SZ")
 
 
+INTERVALS = ["1", "3", "5", "15", "30", "60", "120", "240", "360", "720", "D", "W", "M"]
+OHLCV_FIELDS = ["time", "open", "high", "low", "close", "volume", "turnover"]
+
+
 class ByBitOHLCV(BaseModel):
     """Pydantic model that represents an OHLCV dataset for a given instrument."""
 
@@ -118,11 +134,11 @@ class ByBitOHLCV(BaseModel):
         alias_generator=to_camel, validate_by_name=True, validate_by_alias=True
     )
 
-    start_time: datetime
-    open_price: Decimal
-    high_price: Decimal
-    low_price: Decimal
-    close_price: Decimal
+    time: datetime
+    open: Decimal
+    high: Decimal
+    low: Decimal
+    close: Decimal
     volume: Decimal
     turnover: Decimal | None = None
 
@@ -131,37 +147,19 @@ class ByBitOHLCV(BaseModel):
     def _from_sequence(cls, data):
         """Allow parsing the raw list payload returned by ByBit."""
         if isinstance(data, (list, tuple)):
-            keys = [
-                "start_time",
-                "open_price",
-                "high_price",
-                "low_price",
-                "close_price",
-                "volume",
-                "turnover",
-            ]
-            extracted = {
-                key: data[idx] for idx, key in enumerate(keys) if idx < len(data)
-            }
+            # Keys must match ByBitOHLCV fields in order: time, open, high, low, close, volume, turnover
+            extracted = dict(zip(OHLCV_FIELDS, data))
             return extracted
         return data
 
-    @field_validator("start_time", mode="before")
+    @field_validator("time", mode="before")
     @classmethod
-    def _parse_start_time(cls, value):
+    def _parse_time(cls, value):
         if isinstance(value, datetime):
             return _ensure_utc(value)
         return datetime.fromtimestamp(int(value) / 1000, tz=timezone.utc)
 
-    @field_validator(
-        "open_price",
-        "high_price",
-        "low_price",
-        "close_price",
-        "volume",
-        "turnover",
-        mode="before",
-    )
+    @field_validator(*OHLCV_FIELDS, mode="before")
     @classmethod
     def _parse_decimal(cls, value):
         if value is None:
@@ -173,21 +171,7 @@ class ByBitOHLCV(BaseModel):
     @classmethod
     def intervals(cls) -> list[str]:
         """Return a list of supported ByBit KLine intervals."""
-        return [
-            "1",
-            "3",
-            "5",
-            "15",
-            "30",
-            "60",
-            "120",
-            "240",
-            "360",
-            "720",
-            "D",
-            "W",
-            "M",
-        ]
+        return INTERVALS
 
     @classmethod
     def fetch(
@@ -202,10 +186,7 @@ class ByBitOHLCV(BaseModel):
     ) -> list["ByBitOHLCV"]:
         """Fetch KLine (OHLCV) data from ByBit for the requested instrument."""
         logger.info(
-            "ByBit OHLCV fetch started for %s (%s) on interval %s",
-            symbol,
-            category,
-            interval,
+            f"ByBit OHLCV fetch started for {symbol} ({category}) on interval {interval}"
         )
 
         endpoint = "https://api.bybit.com/v5/market/kline"
@@ -231,38 +212,21 @@ class ByBitOHLCV(BaseModel):
 
         logger.trace(f"ByBit OHLCV fetch response: {response.text}")
 
-        parsed = ByBitResponse["ByBitOHLCV"].model_validate(response.json())
-        return parsed.result.data
+        response = ByBitResponse["ByBitOHLCV"].model_validate(response.json())
+        return response.result.data
 
-    # def save_to_csv(self, directory: str | Path = ".") -> Path:
-    #     """Persist OHLCV data to CSV with a descriptive filename."""
-    #     if not self.candles:
-    #         msg = "Cannot save ByBit OHLCV data because no candles were fetched."
-    #         raise ValueError(msg)
-    #
-    #     output_dir = Path(directory)
-    #     output_dir.mkdir(parents=True, exist_ok=True)
-    #
-    #     start_token = _format_filename_timestamp(self.candles[0].start_time)
-    #     end_token = _format_filename_timestamp(self.candles[-1].start_time)
-    #     filename = f"{start_token}_{end_token}_{self.interval}.csv"
-    #     file_path = output_dir / filename
-    #
-    #     fieldnames = [
-    #         "start_time",
-    #         "open_price",
-    #         "high_price",
-    #         "low_price",
-    #         "close_price",
-    #         "volume",
-    #         "turnover",
-    #     ]
-    #
-    #     with file_path.open("w", newline="") as csvfile:
-    #         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    #         writer.writeheader()
-    #         for candle in self.candles:
-    #             writer.writerow(candle.as_csv_row())
-    #
-    #     logger.info(f"ByBit OHLCV data saved to {file_path}")
-    #     return file_path
+    @classmethod
+    def to_csv(
+        cls,
+        symbol: str,
+        interval: str,
+        *,
+        start: datetime | int | float | None = None,
+        end: datetime | int | float | None = None,
+        candles: list["ByBitOHLCV"],
+    ):
+        start_ms = _to_milliseconds(start)
+        end_ms = _to_milliseconds(end)
+
+        path = f"../../data/bybit_ohlcv_{symbol}_{interval}_{start_ms}_{end_ms}.csv"
+        pd.DataFrame([c.model_dump() for c in candles]).to_csv(path, index=False)
