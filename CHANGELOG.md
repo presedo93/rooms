@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0](https://github.com/presedo93/rooms/compare/rooms@v0.1.0...rooms@v0.2.0) (2025-10-07)
+
+
+### Features
+
+* fetch ByBit OHLCV data ([e5f2654](https://github.com/presedo93/rooms/commit/e5f2654b81befa0423ed6fc3c55f0661cea1d422))
+* **tape:** plot bybit candles ([6aea3eb](https://github.com/presedo93/rooms/commit/6aea3ebb9f1ceb1ef15e70b3e6725c750c4e1981))
+
 ## 0.1.0 (2025-10-06)
 
 
