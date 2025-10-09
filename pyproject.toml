@@ -5,34 +5,21 @@ description = "Welcome to all my trading rooms!"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "loguru>=0.7.3",
-    "numpy>=2.3.3",
-    "pandas>=2.3.3",
-    "plotly>=6.3.1",
-    "streamlit>=1.50.0",
+  "loguru>=0.7.3",
+  "numpy>=2.3.3",
+  "pandas>=2.3.3",
+  "streamlit>=1.50.0",
 ]
 
 [dependency-groups]
-dev = [
-  "pytest>=8.0.0",
-  "black>=24.0.0",
-  "isort>=5.13.0",
-  "flake8>=7.0.0",
-  "basedpyright>=1.16.0",
-  "pre-commit>=3.8.0",
-]
+dev = ["pytest>=8.0.0", "pre-commit>=3.8.0"]
 
 [tool.uv.workspace]
-members = ["tape", "replay", "lab", "desk"]
+members = ["desk", "tape", "replay", "lab"]
 
-[tool.black]
-line-length = 88
-target-version = ['py313']
-
-[tool.isort]
-profile = "black"
-line_length = 88
-known_first_party = ["rooms", "tape", "replay", "lab", "desk"]
+[tool.ruff]
+preview = true
+line-length = 100
 
 [tool.pyright]
 typeCheckingMode = "standard"

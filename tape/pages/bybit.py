@@ -1,8 +1,9 @@
 from datetime import datetime
 
-import plotly.graph_objects as go
 import streamlit as st
 from models.bybit import ByBitCategory, ByBitInstrument, ByBitOHLCV
+
+from desk.plotting.candles import plot_candles
 
 
 def bybit_page():
@@ -45,22 +46,14 @@ def candles_expander():
                     end=end_dt,
                 )
 
-                candlestick = go.Candlestick(
+                fig = plot_candles(
                     x=[candle.time for candle in candles],
                     open=[candle.open for candle in candles],
                     high=[candle.high for candle in candles],
                     low=[candle.low for candle in candles],
                     close=[candle.close for candle in candles],
-                    # volume=[candle.volume for candle in candles],
+                    symbol=instrument.symbol,
                 )
-
-                layout = go.Layout(
-                    title=f"Candlestick Chart for {instrument.symbol}",
-                    xaxis=dict(title="Date"),
-                    yaxis=dict(title="Price"),
-                )
-
-                fig = go.Figure(data=[candlestick], layout=layout)
                 st.plotly_chart(fig, use_container_width=True)
 
                 # if st.button("Download OHLCV data as CSV"):
