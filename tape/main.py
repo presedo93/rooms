@@ -1,7 +1,15 @@
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 import streamlit as st
 from loguru import logger
-from pages.bybit import bybit_page
-from pages.gecko import gecko_page
+
+from tape.pages.bybit import bybit_page
+from tape.pages.gecko import gecko_page
 
 logger.level("DEBUG")
 logger.add("tape.log", retention="2 days")

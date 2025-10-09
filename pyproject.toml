@@ -9,13 +9,13 @@ dependencies = [
   "numpy>=2.3.3",
   "pandas>=2.3.3",
   "streamlit>=1.50.0",
+  "plotly>=6.3.1",
+  "httpx>=0.28.1",
+  "pydantic>=2.11.10",
 ]
 
 [dependency-groups]
 dev = ["pytest>=8.0.0", "pre-commit>=3.8.0"]
-
-[tool.uv.workspace]
-members = ["desk", "tape", "replay", "lab"]
 
 [tool.ruff]
 preview = true

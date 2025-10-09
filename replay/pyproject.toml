@@ -1,7 +1,0 @@
-[project]
-name = "replay"
-version = "0.1.0"
-description = "This is the room where all the strats are replayed and optimized."
-readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
