@@ -1,26 +1,16 @@
-import sys
-from pathlib import Path
-
-ROOT_DIR = Path(__file__).resolve().parents[1]
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
-
 import streamlit as st
 from loguru import logger
 
 from tape.pages.bybit import bybit_page
 from tape.pages.gecko import gecko_page
 
-logger.level("DEBUG")
-logger.add("tape.log", retention="2 days")
 
-
-def main():
-    logger.info("Tape started")
-    st.title("📼 Welcome to my Tape room")
+def tape_pages():
+    logger.debug("Tape visited")
+    st.header("📼 ~ tape room")
 
     gecko = st.Page(gecko_page, title="Gecko", icon="🦎", url_path="/")
-    bybit = st.Page(bybit_page, title="Gecko", icon="🧠", url_path="/bybit")
+    bybit = st.Page(bybit_page, title="Bybit", icon="🧠", url_path="/bybit")
 
     with st.container(horizontal=True):
         st.page_link(gecko, label="Go to Gecko")
@@ -31,4 +21,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    tape_pages()
