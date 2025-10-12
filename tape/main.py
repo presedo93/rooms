@@ -1,12 +1,10 @@
 import streamlit as st
-from loguru import logger
 
 from tape.pages.bybit import bybit_page
 from tape.pages.gecko import gecko_page
 
 
 def tape_pages():
-    logger.debug("Tape visited")
     st.header("📼 ~ tape room")
 
     gecko = st.Page(gecko_page, title="Gecko", icon="🦎", url_path="/")
