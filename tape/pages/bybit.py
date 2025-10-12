@@ -1,9 +1,9 @@
 from datetime import datetime
 
 import streamlit as st
-from models.bybit import ByBitCategory, ByBitInstrument, ByBitOHLCV
 
 from desk.plotting.candles import plot_candles
+from tape.models.bybit import ByBitCategory, ByBitInstrument, ByBitOHLCV
 
 
 def bybit_page():

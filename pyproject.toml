@@ -9,17 +9,21 @@ dependencies = [
   "numpy>=2.3.3",
   "pandas>=2.3.3",
   "streamlit>=1.50.0",
+  "plotly>=6.3.1",
+  "httpx>=0.28.1",
+  "pydantic>=2.11.10",
 ]
 
 [dependency-groups]
-dev = ["pytest>=8.0.0", "pre-commit>=3.8.0"]
-
-[tool.uv.workspace]
-members = ["desk", "tape", "replay", "lab"]
+dev = ["pytest>=8.0.0", "pre-commit>=3.8.0", "pyright>=1.1.391", "ruff>=0.14.0"]
 
 [tool.ruff]
 preview = true
 line-length = 100
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.pyright]
 typeCheckingMode = "standard"

@@ -1,18 +1,14 @@
 import streamlit as st
-from loguru import logger
-from pages.bybit import bybit_page
-from pages.gecko import gecko_page
 
-logger.level("DEBUG")
-logger.add("tape.log", retention="2 days")
+from tape.pages.bybit import bybit_page
+from tape.pages.gecko import gecko_page
 
 
-def main():
-    logger.info("Tape started")
-    st.title("📼 Welcome to my Tape room")
+def tape_pages():
+    st.header("📼 ~ tape room")
 
     gecko = st.Page(gecko_page, title="Gecko", icon="🦎", url_path="/")
-    bybit = st.Page(bybit_page, title="Gecko", icon="🧠", url_path="/bybit")
+    bybit = st.Page(bybit_page, title="Bybit", icon="🧠", url_path="/bybit")
 
     with st.container(horizontal=True):
         st.page_link(gecko, label="Go to Gecko")
@@ -23,4 +19,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    tape_pages()

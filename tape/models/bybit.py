@@ -185,9 +185,7 @@ class ByBitOHLCV(BaseModel):
         limit: int | None = None,
     ) -> list["ByBitOHLCV"]:
         """Fetch KLine (OHLCV) data from ByBit for the requested instrument."""
-        logger.info(
-            f"ByBit OHLCV fetch started for {symbol} ({category}) on interval {interval}"
-        )
+        logger.info(f"ByBit OHLCV fetch started for {symbol} ({category}) on interval {interval}")
 
         endpoint = "https://api.bybit.com/v5/market/kline"
         params: dict[str, str | int] = {
