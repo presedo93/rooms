@@ -11,6 +11,7 @@ logger.add("rooms.log", retention="2 days")
 
 def main():
     st.title("🪙 Welcome to my trading room!")
+
     tape = st.Page(tape_pages, title="Tape", icon="📼", url_path="/")
     replay = st.Page(replay_pages, title="Replay", icon="🕹️", url_path="/replay")
     lab = st.Page(lab_pages, title="Lab", icon="🧪", url_path="/lab")
