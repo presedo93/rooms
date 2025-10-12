@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8.0.0", "pre-commit>=3.8.0", "pyright>=1.1.391"]
+dev = ["pytest>=8.0.0", "pre-commit>=3.8.0", "pyright>=1.1.391", "ruff>=0.14.0"]
 
 [tool.ruff]
 preview = true
