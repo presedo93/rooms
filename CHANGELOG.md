@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.0](https://github.com/presedo93/rooms/compare/rooms@v0.1.0...rooms@0.2.0) (2025-10-13)
+
+
+### Features
+
+* fetch ByBit OHLCV data ([e5f2654](https://github.com/presedo93/rooms/commit/e5f2654b81befa0423ed6fc3c55f0661cea1d422))
+* **tape:** plot bybit candles ([6aea3eb](https://github.com/presedo93/rooms/commit/6aea3ebb9f1ceb1ef15e70b3e6725c750c4e1981))
+
+
+### Bug Fixes
+
+* **release:** revert config back to single repo ([d16db6f](https://github.com/presedo93/rooms/commit/d16db6feadb90ac564d722da8955ee31f202ada2))
+* **uv:** workspaces setup WIP ([514d043](https://github.com/presedo93/rooms/commit/514d043e681d3ecf50afe74b7e8bafd9a5e02518))
+* **uv:** workspaces setup WIP ([#3](https://github.com/presedo93/rooms/issues/3)) ([2da1ee4](https://github.com/presedo93/rooms/commit/2da1ee45f35c719466ae752c6111d6b74e523d1d))
+
 ## 0.1.0 (2025-10-06)
 
 
