@@ -1,3 +1,4 @@
+import sys
 import streamlit as st
 from loguru import logger
 
@@ -5,8 +6,9 @@ from lab.main import lab_pages
 from replay.main import replay_pages
 from tape.main import tape_pages
 
-logger.level("DEBUG")
-logger.add("rooms.log", retention="2 days")
+logger.remove()
+logger.add(sys.stderr, level="DEBUG")
+logger.add("rooms.log", level="TRACE", rotation="10 MB", compression="zip")
 
 
 def main():

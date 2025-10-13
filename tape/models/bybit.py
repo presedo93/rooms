@@ -7,6 +7,7 @@ convenience helpers to fetch instrument lists from the public API.
 from datetime import datetime, timezone
 from decimal import Decimal
 from enum import Enum
+from pathlib import Path
 from typing import ClassVar, Generic, TypeVar
 
 import httpx
@@ -214,10 +215,10 @@ class ByBitOHLCV(BaseModel):
         return response.result.data
 
     @classmethod
-    def to_csv(
+    def to_parquet(
         cls,
         symbol: str,
-        interval: str,
+        interval: str | None,
         *,
         start: datetime | int | float | None = None,
         end: datetime | int | float | None = None,
@@ -226,5 +227,15 @@ class ByBitOHLCV(BaseModel):
         start_ms = _to_milliseconds(start)
         end_ms = _to_milliseconds(end)
 
-        path = f"../../data/bybit_ohlcv_{symbol}_{interval}_{start_ms}_{end_ms}.csv"
-        pd.DataFrame([c.model_dump() for c in candles]).to_csv(path, index=False)
+        base_dir = Path(__file__).resolve().parents[2]
+        output_dir = base_dir / "data" / "ohlcv"
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        path = output_dir / f"bybit_{symbol}_{interval}_{start_ms}_{end_ms}.parquet"
+        logger.debug(f"Writing ByBit OHLCV data to {path}")
+        pd.DataFrame([c.model_dump() for c in candles]).to_parquet(
+            path,
+            engine="pyarrow",
+            compression="zstd",
+            index=True,
+        )
