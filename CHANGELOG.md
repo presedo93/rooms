@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/presedo93/rooms/compare/rooms@0.2.0...rooms@0.3.0) (2025-10-13)
+
+
+### Features
+
+* **candles:** Store the candles data in a parquet file ([f9651b3](https://github.com/presedo93/rooms/commit/f9651b38b8c61d171c755b17fcb42d99601af936))
+
 ## [0.2.0](https://github.com/presedo93/rooms/compare/rooms@v0.1.0...rooms@0.2.0) (2025-10-13)
 
 
