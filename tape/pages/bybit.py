@@ -1,19 +1,25 @@
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import cast
 
 import streamlit as st
 
 from desk.plotting.candles import plot_candles
-from tape.models.bybit import ByBitCategory, ByBitInstrument, ByBitOHLCV
+
+from tape.models import get_exchange, Exchange, Instrument
+from tape.models.ohlcv import OHLCV
 
 
 def bybit_page():
+    exchange = get_exchange("bybit")
+
     st.title("Bybit Page")
     st.write("Welcome to the Bybit page!")
 
-    candles_expander()
+    if exchange.has["fetchOHLCV"]:
+        candles_expander(exchange)
 
 
-def candles_expander():
+def candles_expander(exchange: Exchange):
     with st.expander("ByBit OHLCV"):
         if "candles" not in st.session_state:
             st.session_state.candles = None
@@ -23,8 +29,8 @@ def candles_expander():
             st.session_state.start_dt = None
         if "end_dt" not in st.session_state:
             st.session_state.end_dt = None
-        if "interval" not in st.session_state:
-            st.session_state.interval = None
+        if "timeframe" not in st.session_state:
+            st.session_state.timeframe = None
 
         with st.container(horizontal=True):
             from_date = st.date_input("Start date")
@@ -36,31 +42,38 @@ def candles_expander():
         with st.container(horizontal=True, vertical_alignment="bottom"):
             instrument = st.selectbox(
                 "ByBit instrument",
-                options=fetch_instruments(),
-                format_func=lambda i: f"{i.symbol} - {i.category}",
+                options=fetch_instruments(exchange),
+                format_func=lambda i: f"{i.symbol} - {i.type}",
             )
 
-            interval = st.selectbox(
-                "Interval",
-                options=ByBitOHLCV.intervals(),
-            )
+            timeframe = st.selectbox("timeframe", options=exchange.timeframes)
 
             if st.button("Fetch OHLCV data", type="primary"):
-                start_dt = datetime.combine(from_date, from_time)
-                end_dt = datetime.combine(to_date, to_time)
+                # Convert local time inputs to UTC timestamps
+                local_tz = datetime.now().astimezone().tzinfo
+                start_naive = datetime.combine(from_date, from_time)
+                start_local = start_naive.replace(tzinfo=local_tz)
+                start_utc = start_local.astimezone(timezone.utc)
+                start_dt = start_utc.timestamp()
 
-                st.session_state.candles = ByBitOHLCV.fetch(
-                    ByBitCategory.from_str(instrument.category),
-                    instrument.symbol,
-                    interval,
-                    start=start_dt,
-                    end=end_dt,
+                end_naive = datetime.combine(to_date, to_time)
+                end_local = end_naive.replace(tzinfo=local_tz)
+                end_utc = end_local.astimezone(timezone.utc)
+                end_dt = end_utc.timestamp()
+
+                candles = OHLCV.fetch(
+                    exchange,
+                    symbol=instrument.symbol,
+                    timeframe=timeframe,
+                    since=int(start_dt * 1000),
+                    params={"end": int(end_dt * 1000)},
                 )
 
+                st.session_state.candles = candles
                 st.session_state.instrument = instrument
-                st.session_state.start_dt = start_dt
-                st.session_state.end_dt = end_dt
-                st.session_state.interval = interval
+                st.session_state.start_dt = int(start_dt * 1000)
+                st.session_state.end_dt = int(end_dt * 1000)
+                st.session_state.timeframe = timeframe
 
         if st.session_state.candles is not None and st.session_state.instrument is not None:
             with st.container(border=True):
@@ -77,15 +90,17 @@ def candles_expander():
                 )
 
                 if st.button("Download OHLCV data as Parquet", type="primary", width="stretch"):
-                    ByBitOHLCV.to_parquet(
+                    # Type cast needed because session_state typing is imprecise
+                    candles = cast(list[OHLCV], st.session_state.candles)
+                    OHLCV.to_parquet(
                         symbol=st.session_state.instrument.symbol,
-                        interval=st.session_state.interval,
-                        start=st.session_state.start_dt,
+                        timeframe=st.session_state.timeframe,
+                        since=st.session_state.start_dt,
                         end=st.session_state.end_dt,
-                        candles=st.session_state.candles,
+                        candles=candles,
                     )
 
 
 @st.cache_data(show_spinner="Fetching ByBit instruments...")
-def fetch_instruments():
-    return ByBitInstrument.fetch(ByBitCategory.SPOT)
+def fetch_instruments(_exc: Exchange):
+    return Instrument.fetch_list(_exc)
