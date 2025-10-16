@@ -7,8 +7,7 @@ from tape.models import get_exchange
 def bybit_page():
     exchange = get_exchange("bybit")
 
-    st.title("Bybit Page")
-    st.write("Welcome to the Bybit page!")
+    st.title("ByBit")
 
     if exchange.has["fetchOHLCV"]:
         candles_expander(exchange=exchange)

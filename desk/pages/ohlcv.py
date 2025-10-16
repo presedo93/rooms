@@ -10,6 +10,34 @@ from tape.models import Exchange, Instrument
 from tape.models.ohlcv import OHLCV
 
 
+# Exchange-specific parameter names for end time
+EXCHANGE_END_PARAM = {
+    "bybit": "end",
+    "binance": "endTime",
+}
+
+
+def get_end_param(exchange: Exchange) -> str:
+    """Get the parameter name for end time for a specific exchange.
+
+    Args:
+        exchange: Exchange instance
+
+    Returns:
+        str: Parameter name for end time (e.g., "end", "endTime")
+
+    Raises:
+        ValueError: If exchange is not supported
+    """
+    exchange_id = str(exchange.id).lower() if exchange.id else "unknown"
+    if exchange_id not in EXCHANGE_END_PARAM:
+        raise ValueError(
+            f"Exchange '{exchange_id}' not configured. "
+            f"Please add end parameter mapping to EXCHANGE_END_PARAM"
+        )
+    return EXCHANGE_END_PARAM[exchange_id]
+
+
 def initialize_candles_session_state():
     """Initialize session state variables for candles."""
     if "candles" not in st.session_state:
@@ -22,6 +50,8 @@ def initialize_candles_session_state():
         st.session_state.end_dt = None
     if "timeframe" not in st.session_state:
         st.session_state.timeframe = None
+    if "exchange" not in st.session_state:
+        st.session_state.exchange = None
 
 
 def datetime_inputs():
@@ -95,7 +125,7 @@ def fetch_and_store_ohlcv(
         symbol=instrument.symbol,
         timeframe=timeframe,
         since=start_dt,
-        params={"end": end_dt},
+        params={get_end_param(exchange): end_dt},
     )
 
     st.session_state.candles = candles
@@ -103,6 +133,7 @@ def fetch_and_store_ohlcv(
     st.session_state.start_dt = start_dt
     st.session_state.end_dt = end_dt
     st.session_state.timeframe = timeframe
+    st.session_state.exchange = exchange
 
 
 def render_candles_chart():
@@ -127,7 +158,9 @@ def render_download_button():
     if st.button("Download OHLCV", type="primary", width="stretch"):
         # Type cast needed because session_state typing is imprecise
         candles = cast(list[OHLCV], st.session_state.candles)
+        exchange = cast(Exchange, st.session_state.exchange)
         OHLCV.to_parquet(
+            exchange=exchange,
             symbol=st.session_state.instrument.symbol,
             timeframe=st.session_state.timeframe,
             since=st.session_state.start_dt,
