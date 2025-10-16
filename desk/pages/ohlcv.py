@@ -178,7 +178,7 @@ def candles_expander(exchange: Exchange):
         expander_title: Title for the expander
     """
     exchange_name = cast(str, exchange.name)
-    with st.expander("OHLVC"):
+    with st.expander("OHLCV"):
         initialize_candles_session_state()
 
         start_dt, end_dt = datetime_inputs()

@@ -279,7 +279,16 @@ class OHLCV(BaseModel):
         path = output_dir / f"{exchange_prefix}_{symbol}_{timeframe}_{since}_{end or limit}.parquet"
         logger.debug(f"Writing OHLCV data to {path}")
 
-        pd.DataFrame([c.model_dump() for c in candles]).to_parquet(
+        df = pd.DataFrame({
+            "time": [c.time for c in candles],
+            "open": [c.open for c in candles],
+            "high": [c.high for c in candles],
+            "low": [c.low for c in candles],
+            "close": [c.close for c in candles],
+            "volume": [c.volume for c in candles],
+        })
+
+        df.to_parquet(
             path,
             engine="pyarrow",
             compression="zstd",
