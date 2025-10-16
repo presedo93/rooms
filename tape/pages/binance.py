@@ -4,11 +4,11 @@ from desk.pages.ohlcv import candles_expander
 from tape.models import get_exchange
 
 
-def bybit_page():
-    exchange = get_exchange("bybit")
+def binance_page():
+    exchange = get_exchange("binance")
 
-    st.title("Bybit Page")
-    st.write("Welcome to the Bybit page!")
+    st.title("binance Page")
+    st.write("Welcome to the binance page!")
 
     if exchange.has["fetchOHLCV"]:
         candles_expander(exchange=exchange)

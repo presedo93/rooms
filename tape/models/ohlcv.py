@@ -101,6 +101,7 @@ class OHLCV(BaseModel):
         output_dir = base_dir / "data" / "ohlcv"
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        symbol = symbol.replace("/", "")
         path = output_dir / f"bybit_{symbol}_{timeframe}_{since}_{end or limit}.parquet"
         logger.debug(f"Writing OHLCV data to {path}")
 
