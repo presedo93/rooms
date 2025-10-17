@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/presedo93/rooms/compare/rooms@0.3.0...rooms@0.4.0) (2025-10-17)
+
+
+### Features
+
+* **desk:** show volume when plotting ohlcv ([2257551](https://github.com/presedo93/rooms/commit/225755165446e08403bfd20de31ae2b802636fb8))
+* **tape:** replace direct http API calls for ccxt ([#7](https://github.com/presedo93/rooms/issues/7)) ([ba1a532](https://github.com/presedo93/rooms/commit/ba1a532951ae8e3c75005399737606de9195b5e7))
+
 ## [0.3.0](https://github.com/presedo93/rooms/compare/rooms@0.2.0...rooms@0.3.0) (2025-10-13)
 
 
