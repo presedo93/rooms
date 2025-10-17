@@ -142,12 +142,12 @@ def render_candles_chart():
         with st.container(border=True):
             st.plotly_chart(
                 plot_candles(
-                    x=[candle.time for candle in st.session_state.candles],
-                    open=[candle.open for candle in st.session_state.candles],
-                    high=[candle.high for candle in st.session_state.candles],
-                    low=[candle.low for candle in st.session_state.candles],
-                    close=[candle.close for candle in st.session_state.candles],
-                    symbol=st.session_state.instrument.symbol,
+                    x=[c.time for c in st.session_state.candles],
+                    open=[c.open for c in st.session_state.candles],
+                    high=[c.high for c in st.session_state.candles],
+                    low=[c.low for c in st.session_state.candles],
+                    close=[c.close for c in st.session_state.candles],
+                    volume=[c.volume for c in st.session_state.candles],
                 ),
                 use_container_width=True,
             )
