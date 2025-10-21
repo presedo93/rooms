@@ -3,8 +3,10 @@ import streamlit as st
 from loguru import logger
 
 from lab.main import lab_pages
-from replay.main import replay_pages
-from tape.main import tape_pages
+from replay.pages.goldencross import goldencross_page
+from tape.pages.binance import binance_page
+from tape.pages.bybit import bybit_page
+from tape.pages.gecko import gecko_page
 
 logger.remove()
 logger.add(sys.stderr, level="DEBUG")
@@ -14,16 +16,25 @@ logger.add("rooms.log", level="TRACE", rotation="10 MB", compression="zip")
 def main():
     st.title("🪙 Welcome to my trading room!")
 
-    tape = st.Page(tape_pages, title="Tape", icon="📼", url_path="/")
-    replay = st.Page(replay_pages, title="Replay", icon="🕹️", url_path="/replay")
-    lab = st.Page(lab_pages, title="Lab", icon="🧪", url_path="/lab")
+    # Define all pages
+    t_gecko = st.Page(gecko_page, title="Gecko", icon="🦎", url_path="/gecko")
+    t_bybit = st.Page(bybit_page, title="Bybit", icon="🐯", url_path="/bybit")
+    t_binance = st.Page(binance_page, title="Binance", icon="🐝", url_path="/binance")
 
-    with st.container(horizontal=True):
-        st.page_link(tape, label="Go to tape", width="stretch")
-        st.page_link(replay, label="Go to replay", width="stretch")
-        st.page_link(lab, label="Go to lab", width="stretch")
+    r_gc = st.Page(goldencross_page, title="Golden Cross", icon="🛵", url_path="/goldencross")
 
-    st.navigation([tape, replay, lab], position="hidden").run()
+    lab_main = st.Page(lab_pages, title="Lab", icon="🧪", url_path="/lab")
+
+    # Single navigation with grouped pages
+    nav = st.navigation(
+        {
+            "📼 Tape": [t_gecko, t_bybit, t_binance],
+            "🕹️ Replay": [r_gc],
+            "🧪 Lab": [lab_main],
+        },
+        position="top",
+    )
+    nav.run()
 
 
 if __name__ == "__main__":

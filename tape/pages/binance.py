@@ -5,9 +5,8 @@ from tape.models import get_exchange
 
 
 def binance_page():
+    st.header("📼 ~ 🐝 ~ binance")
+
     exchange = get_exchange("binance")
-
-    st.title("Binance")
-
     if exchange.has["fetchOHLCV"]:
         candles_expander(exchange=exchange)
