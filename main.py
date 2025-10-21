@@ -25,7 +25,6 @@ def main():
 
     lab_main = st.Page(lab_pages, title="Lab", icon="🧪", url_path="/lab")
 
-    # Single navigation with grouped pages
     nav = st.navigation(
         {
             "📼 Tape": [t_gecko, t_bybit, t_binance],
