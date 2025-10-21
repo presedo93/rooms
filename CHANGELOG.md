@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/presedo93/rooms/compare/rooms@0.4.0...rooms@0.5.0) (2025-10-21)
+
+
+### Features
+
+* **rooms:** set navigation on top of the screen and simplify pages logic ([42d3fd2](https://github.com/presedo93/rooms/commit/42d3fd24e627b2b985f834111aee288172fad984))
+
 ## [0.4.0](https://github.com/presedo93/rooms/compare/rooms@0.3.0...rooms@0.4.0) (2025-10-19)
 
 
