@@ -9,13 +9,17 @@ The strategy uses vectorbt for efficient backtesting and portfolio analysis.
 
 from typing import cast
 import pandas as pd
-import plotly.graph_objects as go
 import streamlit as st
 import talib
 import vectorbt as vbt
 from loguru import logger
 
 from desk.files import upload_ohlcv_parquet_with_preview
+from desk.plotting.backtest import (
+    plot_drawdown_from_vectorbt,
+    plot_portfolio_equity_from_vectorbt,
+    plot_price_with_signals,
+)
 
 
 def goldencross_page():
@@ -167,6 +171,8 @@ def run_golden_cross_backtest(
                 slow_ma=slow_ma,
                 entries=entries,
                 exits=exits,
+                fast_window=fast_window,
+                slow_window=slow_window,
             )
 
         except Exception as e:
@@ -181,6 +187,8 @@ def display_backtest_results(
     slow_ma: pd.Series,
     entries: pd.Series,
     exits: pd.Series,
+    fast_window: int | None = None,
+    slow_window: int | None = None,
 ) -> None:
     """Display comprehensive backtest results with metrics and visualizations.
 
@@ -263,17 +271,33 @@ def display_backtest_results(
 
     # Equity curve
     st.subheader("💰 Equity Curve")
-    fig_equity = create_equity_chart(portfolio, close_prices)
+    fig_equity = plot_portfolio_equity_from_vectorbt(
+        portfolio=portfolio,
+        close_prices=close_prices,
+        strategy_name="Golden Cross Strategy",
+    )
     st.plotly_chart(fig_equity, use_container_width=True)
 
     # Price chart with signals
     st.subheader("📉 Price Chart with Signals")
-    fig_signals = create_signals_chart(
-        close_prices=close_prices,
-        fast_ma=fast_ma,
-        slow_ma=slow_ma,
+    # Build indicators dict with window info if available
+    indicators = {}
+    if fast_window is not None:
+        indicators[f"Fast MA ({fast_window})"] = fast_ma
+    else:
+        indicators["Fast MA"] = fast_ma
+
+    if slow_window is not None:
+        indicators[f"Slow MA ({slow_window})"] = slow_ma
+    else:
+        indicators["Slow MA"] = slow_ma
+
+    fig_signals = plot_price_with_signals(
+        price=close_prices,
         entries=entries,
         exits=exits,
+        indicators=indicators,
+        title="Price Chart with Golden Cross Signals",
     )
     st.plotly_chart(fig_signals, use_container_width=True)
 
@@ -300,176 +324,5 @@ def display_backtest_results(
 
     # Drawdown chart
     with st.expander("📉 Drawdown Analysis", expanded=False):
-        fig_dd = create_drawdown_chart(portfolio)
+        fig_dd = plot_drawdown_from_vectorbt(portfolio)
         st.plotly_chart(fig_dd, use_container_width=True)
-
-
-def create_equity_chart(portfolio, close_prices: pd.Series) -> go.Figure:
-    """Create equity curve visualization.
-
-    Args:
-        portfolio: vectorbt Portfolio object
-        close_prices: Series of close prices
-
-    Returns:
-        Plotly Figure object
-    """
-    equity = portfolio.value()
-    buy_hold_value = (close_prices / close_prices.iloc[0]) * portfolio.init_cash
-
-    fig = go.Figure()
-
-    # Strategy equity
-    fig.add_trace(
-        go.Scatter(
-            x=equity.index,
-            y=equity.values,
-            name="Golden Cross Strategy",
-            line=dict(color="#00CC96", width=2),
-        )
-    )
-
-    # Buy & Hold benchmark
-    fig.add_trace(
-        go.Scatter(
-            x=buy_hold_value.index,
-            y=buy_hold_value.values,
-            name="Buy & Hold",
-            line=dict(color="#636EFA", width=2, dash="dash"),
-        )
-    )
-
-    fig.update_layout(
-        title="Portfolio Value Over Time",
-        xaxis_title="Date",
-        yaxis_title="Portfolio Value ($)",
-        hovermode="x unified",
-        template="plotly_white",
-        height=400,
-    )
-
-    return fig
-
-
-def create_signals_chart(
-    close_prices: pd.Series,
-    fast_ma: pd.Series,
-    slow_ma: pd.Series,
-    entries: pd.Series,
-    exits: pd.Series,
-) -> go.Figure:
-    """Create price chart with moving averages and trade signals.
-
-    Args:
-        close_prices: Series of close prices
-        fast_ma: Fast moving average series
-        slow_ma: Slow moving average series
-        entries: Boolean series indicating entry signals
-        exits: Boolean series indicating exit signals
-
-    Returns:
-        Plotly Figure object
-    """
-    fig = go.Figure()
-
-    # Price
-    fig.add_trace(
-        go.Scatter(
-            x=close_prices.index,
-            y=close_prices.values,
-            name="Close Price",
-            line=dict(color="#636EFA", width=1),
-        )
-    )
-
-    # Fast MA
-    fig.add_trace(
-        go.Scatter(
-            x=fast_ma.index,
-            y=fast_ma.values,
-            name=f"Fast MA ({len(fast_ma.dropna())})",
-            line=dict(color="#00CC96", width=1.5),
-        )
-    )
-
-    # Slow MA
-    fig.add_trace(
-        go.Scatter(
-            x=slow_ma.index,
-            y=slow_ma.values,
-            name=f"Slow MA ({len(slow_ma.dropna())})",
-            line=dict(color="#EF553B", width=1.5),
-        )
-    )
-
-    # Entry signals
-    entry_points: pd.Series = close_prices[entries]  # type: ignore[assignment]
-    if len(entry_points) > 0:
-        fig.add_trace(
-            go.Scatter(
-                x=entry_points.index,
-                y=entry_points.values,
-                mode="markers",
-                name="Buy Signal",
-                marker=dict(color="green", size=10, symbol="triangle-up"),
-            )
-        )
-
-    # Exit signals
-    exit_points: pd.Series = close_prices[exits]  # type: ignore[assignment]
-    if len(exit_points) > 0:
-        fig.add_trace(
-            go.Scatter(
-                x=exit_points.index,
-                y=exit_points.values,
-                mode="markers",
-                name="Sell Signal",
-                marker=dict(color="red", size=10, symbol="triangle-down"),
-            )
-        )
-
-    fig.update_layout(
-        title="Price Chart with Golden Cross Signals",
-        xaxis_title="Date",
-        yaxis_title="Price ($)",
-        hovermode="x unified",
-        template="plotly_white",
-        height=500,
-    )
-
-    return fig
-
-
-def create_drawdown_chart(portfolio) -> go.Figure:
-    """Create drawdown visualization.
-
-    Args:
-        portfolio: vectorbt Portfolio object
-
-    Returns:
-        Plotly Figure object
-    """
-    drawdown = portfolio.drawdown() * 100
-
-    fig = go.Figure()
-
-    fig.add_trace(
-        go.Scatter(
-            x=drawdown.index,
-            y=drawdown.values,
-            name="Drawdown",
-            fill="tozeroy",
-            line=dict(color="#EF553B", width=1),
-        )
-    )
-
-    fig.update_layout(
-        title="Drawdown Over Time",
-        xaxis_title="Date",
-        yaxis_title="Drawdown (%)",
-        hovermode="x unified",
-        template="plotly_white",
-        height=300,
-    )
-
-    return fig
