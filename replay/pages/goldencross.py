@@ -281,8 +281,17 @@ def display_backtest_results(
     st.subheader("📋 Trade History")
     trades_df = portfolio.trades.records_readable
     if len(trades_df) > 0:
+        # Select columns that exist in the dataframe
+        available_cols = trades_df.columns.tolist()
+        desired_cols = ["Entry Date", "Exit Date", "PnL", "Return", "Duration"]
+        display_cols = [col for col in desired_cols if col in available_cols]
+
+        # If no desired columns exist, show all columns
+        if not display_cols:
+            display_cols = available_cols
+
         st.dataframe(
-            trades_df[["Entry Date", "Exit Date", "PnL", "Return", "Duration"]],
+            trades_df[display_cols],
             use_container_width=True,
             hide_index=True,
         )
