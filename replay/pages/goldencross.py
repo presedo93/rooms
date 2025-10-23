@@ -8,6 +8,7 @@ The strategy uses vectorbt for efficient backtesting and portfolio analysis.
 """
 
 from typing import cast
+
 import pandas as pd
 import streamlit as st
 import talib
@@ -21,6 +22,7 @@ from desk.plotting.backtest import (
     plot_price_with_signals,
 )
 from desk.stats import display_backtest_metrics
+from desk.typing.vectorbt import PortfolioProtocol
 
 
 def goldencross_page():
@@ -165,8 +167,9 @@ def run_golden_cross_backtest(
             )
 
             # Display results
+            # Cast to Protocol type for LSP autocomplete while maintaining runtime compatibility
             display_backtest_results(
-                portfolio=portfolio,
+                portfolio=cast(PortfolioProtocol, portfolio),
                 close_prices=close_prices,
                 fast_ma=fast_ma,
                 slow_ma=slow_ma,
@@ -182,7 +185,7 @@ def run_golden_cross_backtest(
 
 
 def display_backtest_results(
-    portfolio,
+    portfolio: PortfolioProtocol,
     close_prices: pd.Series,
     fast_ma: pd.Series,
     slow_ma: pd.Series,

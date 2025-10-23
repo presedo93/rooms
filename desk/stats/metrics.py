@@ -7,9 +7,11 @@ in a consistent format across different strategies.
 import pandas as pd
 import streamlit as st
 
+from desk.typing.vectorbt import PortfolioProtocol
+
 
 def display_backtest_metrics(
-    portfolio,
+    portfolio: PortfolioProtocol,
     close_prices: pd.Series,
     strategy_name: str = "Strategy",
 ) -> None:
@@ -53,7 +55,7 @@ def display_backtest_metrics(
 
     with col3:
         max_dd = portfolio.max_drawdown() * 100
-        st.metric("Max Drawdown", f"{max_dd:.2f}%", delta=f"-{max_dd:.2f}%")
+        st.metric("Max Drawdown", f"{max_dd:.2f}%", delta=f"{max_dd:.2f}%")
 
     with col4:
         win_rate = portfolio.trades.win_rate() * 100
@@ -112,5 +114,4 @@ def display_backtest_metrics(
             "Outperformance",
             f"{outperformance:.2f}%",
             delta=f"{outperformance:.2f}%",
-            delta_color="normal" if outperformance > 0 else "inverse",
         )

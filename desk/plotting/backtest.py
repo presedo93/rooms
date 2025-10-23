@@ -4,10 +4,10 @@ This module provides reusable charting functions for visualizing
 backtesting results including equity curves, drawdowns, and price signals.
 """
 
-from typing import Any
-
 import pandas as pd
 import plotly.graph_objects as go
+
+from desk.typing.vectorbt import PortfolioProtocol
 
 
 def plot_equity_curve(
@@ -206,7 +206,7 @@ def plot_price_with_signals(
 
 
 def plot_portfolio_equity_from_vectorbt(
-    portfolio: Any,
+    portfolio: PortfolioProtocol,
     close_prices: pd.Series,
     *,
     strategy_name: str = "Strategy",
@@ -241,7 +241,7 @@ def plot_portfolio_equity_from_vectorbt(
 
 
 def plot_drawdown_from_vectorbt(
-    portfolio: Any,
+    portfolio: PortfolioProtocol,
     *,
     title: str = "Drawdown Over Time",
     height: int = 300,
