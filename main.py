@@ -3,10 +3,8 @@ import streamlit as st
 from loguru import logger
 
 from lab.main import lab_pages
-from replay.pages.goldencross import goldencross_page
-from tape.pages.binance import binance_page
-from tape.pages.bybit import bybit_page
-from tape.pages.gecko import gecko_page
+from replay.pages import goldencross_page
+from tape.pages import gecko_page, bybit_page, binance_page
 
 logger.remove()
 logger.add(sys.stderr, level="DEBUG")
@@ -25,7 +23,6 @@ def main():
 
     lab_main = st.Page(lab_pages, title="Lab", icon="🧪", url_path="/lab")
 
-    # Single navigation with grouped pages
     nav = st.navigation(
         {
             "📼 Tape": [t_gecko, t_bybit, t_binance],
