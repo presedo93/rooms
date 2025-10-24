@@ -30,7 +30,12 @@ trading platform.
 **Strategy optimization room** - Replays and optimizes trading strategies.
 
 - **Purpose**: Backtesting and strategy refinement
-- **Status**: Initial setup
+- **Features**:
+  - Golden Cross (DMAC) strategy backtesting
+  - Parameter optimization using vectorbt broadcasting
+  - Comprehensive performance metrics and visualizations
+  - Heatmap analysis for parameter exploration
+- **Status**: Active development
 
 ### 🧪 Lab
 
@@ -77,32 +82,59 @@ Each room contains:
    python --version
    ```
 
-2. **Setup**:
-
-    ```bash
-    # Clone and enter directory
-    cd rooms
-
-    # Install dependencies for the root package
-    uv sync
-
-    # Install dependencies for all workspace members
-    uv sync --all-packages
-
-    # Install the pre-commit hooks
-    uv run pre-commit install
-
-    ```
-
-3. **Run modules**:
+1. **Setup**:
 
    ```bash
-   # Run entire system
+   # Clone and enter directory
+   cd rooms
+
+   # Install dependencies for the root package
+   uv sync
+
+   # Install dependencies for all workspace members
+   uv sync --all-packages
+
+   # Install the pre-commit hooks
+   uv run pre-commit install
+
+   ```
+
+1. **Run modules**:
+
+   ```bash
+   # Run entire system (Streamlit dashboard)
    uv run python main.py
 
    # Run specific room
    cd desk && uv run python main.py
+
+   # Test optimization functionality
+   uv run python test_optimization.py
    ```
+
+## Features
+
+### Strategy Backtesting (Replay Room)
+
+The Replay room provides powerful backtesting capabilities:
+
+#### Golden Cross Strategy
+
+- Classic dual moving average crossover strategy
+- Two modes:
+  - **Single Backtest**: Test one parameter set
+  - **Parameter Optimization**: Find best MA windows automatically
+
+#### Optimization Highlights
+
+- ⚡ **Fast**: Uses vectorbt's broadcasting for parallel testing
+- 📊 **Visual**: Heatmap shows performance across parameter space
+- 🎯 **Flexible**: Optimize for Sharpe, Return, Calmar, Sortino, or Win Rate
+- 📈 **Comprehensive**: Full metrics and trade analysis
+- 💾 **Exportable**: Download results as CSV
+
+**Example**: Test 100 parameter combinations (10 fast windows × 10 slow windows)
+in seconds instead of minutes.
 
 ## Development
 
